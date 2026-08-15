@@ -915,7 +915,19 @@ var server = app.listen(port, (err) => {
 
 });
 
-global.io = require('socket.io')(server);
+global.io = require('socket.io')(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  },
+  pingInterval: 25000,
+  pingTimeout: 60000,
+  allowEIO3: true,
+  connectionStateRecovery: {
+    maxDisconnectionDuration: 2 * 60 * 1000,
+    skipMiddlewares: true
+  }
+});
 var clients = {}
 
 io.sockets.on('connection', function (socket) {
@@ -924,7 +936,7 @@ io.sockets.on('connection', function (socket) {
   notifyMultipleControllers(); // on Connection
 
   socket.on('disconnect', async function () {
-    let SPXClientName = clients[socket.id].SPXClientName || '** no name **';
+    let SPXClientName = (clients[socket.id] && clients[socket.id].SPXClientName) || '** no name **';
     logger.verbose('*** Socket disconnected (' + socket.id + ") Connections: " + io.engine.clientsCount);
     delete clients[socket.id];
 

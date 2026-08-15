@@ -254,43 +254,72 @@ router.post('/disable', async (req, res) => {
 const net = require('net')
 let ServerDataForLogger = [];
 
-if (config.casparcg) {
-  config.casparcg.servers.forEach((element,index) => {
-    const CurName = element.name;
-    const CurHost = element.host;
-    const CurPort = element.port;
+function emitCCGStatus(index, color, statusText) {
+  if (typeof io === 'undefined' || !io) { return; }
+  io.emit('SPXMessage2Client', { spxcmd: 'updateServerIndicator', indicator: 'indicator' + index, color: color });
+  if (statusText) {
+    io.emit('SPXMessage2Client', { spxcmd: 'updateStatusText', status: statusText });
+  }
+}
 
-    ServerDataForLogger.push({ name: CurName, host: CurHost, port: CurPort });
+function attachCasparCGServer(index, CurName, CurHost, CurPort) {
+  let retryDelay = 1000;
+  let retryTimer = null;
+  let loggedOffline = false;
 
-    // next two lines creates a dynamic variable for this loop iteration
-    // Changed in 1.3.0, from:
-    // var CurCCG = CurName + "= undefined";
-    // eval(CurCCG);
+  function clearRetryTimer() {
+    if (retryTimer) {
+      clearTimeout(retryTimer);
+      retryTimer = null;
+    }
+  }
 
-    // ..to:
-    var CurCCG = new net.Socket();
-    // end of change
+  function scheduleReconnect() {
+    if (retryTimer) { return; }
+    retryTimer = setTimeout(function () {
+      retryTimer = null;
+      connect();
+      retryDelay = Math.min(retryDelay * 2, 30000);
+    }, retryDelay);
+  }
 
-    global.CCGSockets.push(CurCCG); // --> PUSH Socket object to a global array for later use
-    CurCCG.spxname = CurName; // save each entry a name for later searching!
-    CurCCG.spxhost = CurHost; // save each entry a host for later searching! (v.1.0.14)
-    CurCCG.spxport = CurPort; // save each entry a port for later searching! (v.1.0.14)
+  function connect() {
+    clearRetryTimer();
+    const previous = global.CCGSockets[index];
+    if (previous && previous.connecting && !previous.destroyed) {
+      return;
+    }
+    if (previous && !previous.destroyed) {
+      previous.removeAllListeners();
+      previous.destroy();
+    }
 
-    CurCCG.connect(CurPort, CurHost, function () {
-      ServerDataForLogger.push({ name: CurName, host: CurHost, port: CurPort });
-      data = { spxcmd: 'updateServerIndicator', indicator: 'indicator' + index, color: '#00CC00' };
-      io.emit('SPXMessage2Client', data);
-      data = { spxcmd: 'updateStatusText', status: 'Communication established with ' + CurName + '.' };
-      io.emit('SPXMessage2Client', data);
+    const CurCCG = new net.Socket();
+    CurCCG.spxname = CurName;
+    CurCCG.spxhost = CurHost;
+    CurCCG.spxport = CurPort;
+    CurCCG.spxReconnect = function () {
+      retryDelay = 1000;
+      scheduleReconnect();
+    };
+    global.CCGSockets[index] = CurCCG;
+
+    CurCCG.connect(CurPort, CurHost);
+
+    CurCCG.on('connect', function () {
+      retryDelay = 1000;
+      loggedOffline = false;
+      CurCCG.setKeepAlive(true, 10000);
+      CurCCG.setNoDelay(true);
+      emitCCGStatus(index, '#00CC00', 'Communication established with ' + CurName + '.');
       logger.verbose('SPX connected to CasparCG as \'' + CurName + '\' at ' + CurHost + ":" + CurPort + '.');
     });
 
     CurCCG.on('data', function (data) {
       logger.verbose('SPX received data from CasparCG ' + CurName + ': ' + data);
 
-      // we must parse the data so we can evaluate it...
-      let CCG_RETURN_TEXT = String(data).replace('\r','').replace('\n',''); // convert return object to string, strip \r\n
-      let CCG_RETURN_CODE = CCG_RETURN_TEXT.substring(0, 2); // first two chars
+      let CCG_RETURN_TEXT = String(data).replace('\r','').replace('\n','');
+      let CCG_RETURN_CODE = CCG_RETURN_TEXT.substring(0, 2);
       switch (CCG_RETURN_CODE) {
         case "20":
           logger.verbose('Comms good with ' + CurName + ": " + CCG_RETURN_TEXT);
@@ -299,14 +328,12 @@ if (config.casparcg) {
         case "40":
           logger.error(CurName + ' CasparCG response: ' + CCG_RETURN_TEXT );
           logger.debug('Verify CasparCG\'s (' + CurName + ') access to templates on SPX server at ' + spx.getTemplateSourcePath());
-          data = { spxcmd: 'updateStatusText', status: 'Error in comms with ' + CurName + '.' };
-          io.emit('SPXMessage2Client', data);
+          emitCCGStatus(index, '#00CC00', 'Error in comms with ' + CurName + '.');
           break;
 
         case "50":
           logger.error('Failed ' + CurName + ": " + CCG_RETURN_TEXT);
-          data = { spxcmd: 'updateStatusText', status: CurName + ' failed.' };
-          io.emit('SPXMessage2Client', data);
+          emitCCGStatus(index, '#00CC00', CurName + ' failed.');
           break;
 
         default:
@@ -314,37 +341,36 @@ if (config.casparcg) {
           break;
       }
 
-
-      // SocketIO call to client
-      data = { spxcmd: 'updateServerIndicator', indicator: 'indicator' + index, color: '#00CC00' };
-      io.emit('SPXMessage2Client', data);
-      if (data.toString().endsWith('exit')) {
-        CCGclient.destroy();
-      }
+      emitCCGStatus(index, '#00CC00');
     });
 
     CurCCG.on('close', function () {
-      // SocketIO call to client
-      data = { spxcmd: 'updateServerIndicator', indicator: 'indicator' + index, color: '#CC0000' };
-      io.emit('SPXMessage2Client', data);
-      data = { spxcmd: 'updateStatusText', status: 'Connection to ' + CurName + ' was closed.' };
-      io.emit('SPXMessage2Client', data);
-      logger.verbose('SPX connection to CasparCG "' + CurName + '" closed (' + CurHost + ':' + CurPort + ').');
+      emitCCGStatus(index, '#CC0000', loggedOffline ? null : 'Connection to ' + CurName + ' was closed.');
+      logger.verbose('SPX connection to CasparCG "' + CurName + '" closed (' + CurHost + ':' + CurPort + '). Reconnecting...');
+      scheduleReconnect();
     });
 
-    CurCCG.on('error', function (err) {
-      // console.log('Still 4?', CurCCG.connecting)
-      data = { spxcmd: 'updateServerIndicator', indicator: 'indicator' + index, color: '#CC0000' };
-      io.emit('SPXMessage2Client', data);
-
-      data = { spxcmd: 'updateStatusText', status: 'Communication error with ' + CurName + '.' };
-      io.emit('SPXMessage2Client', data);
-
-      logger.warn('Unable to connect CasparCG "' + CurName + '" (' + CurCCG.spxhost + ':'  + CurCCG.spxport + '). Is it running?');
-      // console.log('Sockets: ', global.CCGSockets);
+    CurCCG.on('error', function () {
+      emitCCGStatus(index, '#CC0000', loggedOffline ? null : 'Communication error with ' + CurName + '.');
+      if (!loggedOffline) {
+        logger.warn('Unable to connect CasparCG "' + CurName + '" (' + CurHost + ':' + CurPort + '). Is it running? Will keep retrying.');
+        loggedOffline = true;
+      }
     });
+  }
 
-    // console.log('Still 3?', CurCCG.connecting)
+  connect();
+}
+
+if (config.casparcg) {
+  config.casparcg.servers.forEach((element,index) => {
+    const CurName = element.name;
+    const CurHost = element.host;
+    const CurPort = element.port;
+
+    ServerDataForLogger.push({ name: CurName, host: CurHost, port: CurPort });
+    global.CCGSockets[index] = null;
+    attachCasparCGServer(index, CurName, CurHost, CurPort);
   });
 }; // end if 
 

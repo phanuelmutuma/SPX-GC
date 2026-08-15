@@ -1,0 +1,15 @@
+{
+  "watch": ["server.js", "routes", "utils", "views", "static"],
+  "ext": "js,handlebars,css,html",
+  "ignore": [
+    "DATAROOT/**",
+    "ASSETS/**",
+    "LOG/**",
+    "config.json",
+    "config_*.json",
+    "DATAROOT_VIDEO/**",
+    "node_modules/**",
+    "dist/**",
+    "downloads/**"
+  ]
+}

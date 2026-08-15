@@ -146,6 +146,11 @@ module.exports = {
         // console.log('Pinging ' +  SrvName + ': ' + CCGSockets[SocketIndex]);
         data = { spxcmd: 'updateServerIndicator', indicator: 'indicator' + i, color: '#CC0000' };
         let status = {}
+        if (!CCGSockets[SocketIndex]) {
+          logger.verbose("No socket object for " + SrvName);
+          io.emit('SPXMessage2Client', data);
+          return;
+        }
         status.server = i + ':' + SrvName;
         status.connecting = CCGSockets[SocketIndex].connecting;
         status.isWritable = CCGSockets[SocketIndex].writable;
@@ -154,8 +159,14 @@ module.exports = {
           data.color = '#00CC00';
           logger.verbose("Connection OK to " + SrvName)
         }
+        else if (status.connecting) {
+          logger.verbose("Still connecting to " + SrvName)
+        }
         else{
           logger.verbose("Connection failed to " + SrvName)
+          if (typeof CCGSockets[SocketIndex].spxReconnect === 'function') {
+            CCGSockets[SocketIndex].spxReconnect();
+          }
         }
         io.emit('SPXMessage2Client', data);
       })

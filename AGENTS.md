@@ -7,11 +7,7 @@ SPX Graphics Controller (`spx-gc`) is a single Node.js/Express + Socket.io monol
 ### Running the app (dev)
 - The server runs on `http://localhost:5656`. On first boot it auto-generates `config.json`, `LOG/`, and needed folders.
 - `npm start` (`node server.js`) runs the server directly and works as-is.
-- The committed `npm run dev` script is `nodemon server.js -i DATAROOT/* -i ASSETS/* -i config.json -i DATAROOT_VIDEO/*`. Those `-i` glob args are meant to be nodemon ignore patterns, but because `DATAROOT/` and `ASSETS/` contain subdirectories the shell expands the globs and passes directory paths to `server.js` as its config-file argument, which crashes with `EISDIR ... reading config.json`. To get hot reload, quote the globs so nodemon (not the shell) expands them:
-
-  `npx nodemon server.js -i 'DATAROOT/*' -i 'ASSETS/*' -i 'config.json' -i 'DATAROOT_VIDEO/*'`
-
-  The `nodemon` ignore patterns exist so runtime edits to project/rundown/asset JSON (which happen constantly while operating the UI) do NOT restart the server. Playing graphics in the UI writes to files under `DATAROOT/` (e.g. `DATAROOT/MyFirstProject/data/*.json`); revert those runtime changes before committing.
+- `npm run dev` uses `nodemon.json` so hot reload watches server/UI code only. Runtime writes under `DATAROOT/`, `ASSETS/`, `LOG/`, and `config.json` are ignored and will not restart the server (playing graphics constantly writes rundown JSON). Do not pass unquoted `DATAROOT/*` ignore globs on the command line: the shell expands them and `server.js` treats those directories as a config path (`EISDIR`).
 
 ### Core workflow / hello-world
 Open `http://localhost:5656` → PROJECTS → open `MyFirstProject` → open `MyFirstRundown` (direct URL `http://localhost:5656/gc/MyFirstProject/MyFirstRundown`). Select a rundown item and click the green PLAY button to take a graphic on air (preview renders it and PLAY toggles to red STOP); the "+" button adds template items. A JSON API is available, e.g. `GET /api/v1/version`.
