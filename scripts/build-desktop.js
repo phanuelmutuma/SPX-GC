@@ -128,13 +128,12 @@ function resolveTargets(argv) {
   return [arg];
 }
 
-function findPkgBin() {
-  const names = process.platform === 'win32' ? ['pkg.cmd', 'pkg'] : ['pkg'];
-  for (const name of names) {
-    const candidate = path.join(ROOT, 'node_modules', '.bin', name);
-    if (fs.existsSync(candidate)) return candidate;
+function findPkgEntry() {
+  try {
+    return require.resolve('@yao-pkg/pkg/lib-es5/bin.js');
+  } catch (err) {
+    fail('Could not find @yao-pkg/pkg. Run npm install first. ' + err.message);
   }
-  return 'pkg';
 }
 
 function copyRuntimeFiles(destDir) {
@@ -295,6 +294,28 @@ function zipDirectory(sourceDir, zipPath) {
   rimraf(zipPath);
   const parent = path.dirname(sourceDir);
   const name = path.basename(sourceDir);
+
+  // Node on Windows refuses to spawn .cmd/.bat without shell:true (CVE-2024-27980).
+  // Use PowerShell's zip so the release workflow always gets dist/*.zip.
+  if (process.platform === 'win32') {
+    const escapedSrc = sourceDir.replace(/'/g, "''");
+    const escapedZip = zipPath.replace(/'/g, "''");
+    const zipped = spawnSync(
+      'powershell.exe',
+      [
+        '-NoProfile',
+        '-NonInteractive',
+        '-Command',
+        "Compress-Archive -LiteralPath '" + escapedSrc + "' -DestinationPath '" + escapedZip + "' -Force"
+      ],
+      { stdio: 'inherit' }
+    );
+    if (zipped.status !== 0) {
+      fail('Compress-Archive failed for ' + zipPath);
+    }
+    return;
+  }
+
   const zipCmd = spawnSync(
     'zip',
     ['-r', '-q', zipPath, name],
@@ -433,7 +454,8 @@ function buildTarget(name, icons) {
   // Cross-compiling (Linux -> macOS/Windows) cannot generate V8 bytecode
   // for the target CPU. Ship JS source instead so the snapshot contains
   // server.js and the rest of the app. --public is required with --no-bytecode.
-  run(findPkgBin(), [
+  run(process.execPath, [
+    findPkgEntry(),
     'server.js',
     '--compress',
     'GZip',
