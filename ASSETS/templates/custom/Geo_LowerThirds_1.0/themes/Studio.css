@@ -1,0 +1,35 @@
+:root {
+    --theme-navy: #0b1c3a;
+    --theme-navy-deep: #071227;
+    --theme-blue: #1ea7ff;
+    --theme-orange: #ff9100;
+    --theme-red: #ff3b2f;
+    --theme-lite: #ffffff;
+    --theme-dot: #0a0a0a;
+
+    --theme-viewport-padding-top: 4vw;
+    --theme-viewport-padding-sides: 4.2vw;
+    --theme-viewport-padding-bottom: 6.2vh;
+
+    --slant: 18deg;
+}
+
+@font-face {
+    font-family: "GEO-BOLD";
+    src: url("../fonts/Oswald-Bold.ttf");
+}
+
+@font-face {
+    font-family: "GEO-REGU";
+    src: url("../fonts/Oswald-Regular.ttf");
+}
+
+@font-face {
+    font-family: "GEO-BARLOW";
+    src: url("../fonts/BarlowSemiCondensed-Regular.ttf");
+}
+
+@font-face {
+    font-family: "GEO-BARLOW-BOLD";
+    src: url("../fonts/BarlowSemiCondensed-Bold.ttf");
+}

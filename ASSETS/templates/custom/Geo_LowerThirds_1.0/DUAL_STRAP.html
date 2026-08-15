@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>GEO Dual Strap</title>
+    <script src="js/lib/anime.min.js"></script>
+    <script src="js/spx_interface.js"></script>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" id="DynamicTheme" href="themes/Default.css" />
+    <style>
+        .SPXWindow {
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-start;
+        }
+
+        #gfx {
+            position: relative;
+            display: inline-grid;
+            grid-template-columns: 2.55vw minmax(18vw, max-content) 2.4vw;
+            grid-template-rows: auto auto;
+            align-items: stretch;
+            opacity: 0;
+            z-index: 10;
+            overflow: visible;
+            filter: drop-shadow(0 0.45vw 0.7vw rgba(0, 0, 0, 0.35));
+        }
+
+        .frame {
+            position: absolute;
+            left: 2.35vw;
+            top: -0.4vw;
+            right: 0.15vw;
+            bottom: 0.2vw;
+            pointer-events: none;
+            z-index: 6;
+            transform: skewX(calc(var(--slant) * -1));
+            border-top: 0.16vw solid var(--theme-navy);
+            border-right: 0.16vw solid var(--theme-navy);
+            border-bottom: none;
+            border-left: none;
+        }
+
+        .frame::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            bottom: -0.16vw;
+            width: 22%;
+            height: 0.16vw;
+            background: var(--theme-navy);
+        }
+
+        #titleBar {
+            position: relative;
+            grid-column: 1 / -1;
+            grid-row: 2;
+            display: flex;
+            align-items: center;
+            min-height: 3.35vw;
+            margin-top: -0.28vw;
+            padding: 0.12em 2.1em 0.12em 2.6em;
+            color: var(--theme-lite);
+            background: linear-gradient(90deg, var(--theme-red) 0%, var(--theme-orange) 72%);
+            transform: skewX(calc(var(--slant) * -1));
+            z-index: 2;
+        }
+
+        #titleBar .stripes {
+            position: absolute;
+            left: 0.55vw;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            gap: 0.38vw;
+            z-index: 2;
+        }
+
+        #titleBar .stripes span {
+            display: block;
+            width: 0.28vw;
+            height: 100%;
+            background: var(--theme-navy);
+        }
+
+        #titleBar .chevrons {
+            position: absolute;
+            right: 0.85vw;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 0.18vw;
+            z-index: 3;
+        }
+
+        #titleBar .chevrons i {
+            width: 0.55vw;
+            height: 0.55vw;
+            border-right: 0.16vw solid var(--theme-lite);
+            border-top: 0.16vw solid var(--theme-lite);
+            transform: rotate(45deg);
+            display: block;
+        }
+
+        #nameBar {
+            position: relative;
+            grid-column: 2;
+            grid-row: 1;
+            display: flex;
+            align-items: center;
+            min-height: 4.15vw;
+            padding: 0.08em 1.7em 0.12em 1.55em;
+            color: var(--theme-lite);
+            background: linear-gradient(180deg, var(--theme-navy) 0%, var(--theme-navy-deep) 100%);
+            transform: skewX(calc(var(--slant) * -1));
+            z-index: 4;
+        }
+
+        #titleBar,
+        #nameBar {
+            overflow: visible;
+        }
+
+        #text1,
+        #text2 {
+            display: block;
+            transform: skewX(var(--slant));
+            line-height: 1;
+            color: var(--theme-lite);
+        }
+
+        #text1 {
+            font-family: "GEO-BOLD", sans-serif;
+            font-size: 2.55vw;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding-right: 0.4em;
+        }
+
+        #text2 {
+            font-family: "GEO-BARLOW", sans-serif;
+            font-size: 1.45vw;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0 2.4em 0 0.15em;
+        }
+    </style>
+    <script>
+        function runTemplateUpdate() {
+            if (e('f99') && e('f99').innerText) {
+                e('DynamicTheme').href = e('f99').innerText;
+            }
+            e('text1').innerHTML = htmlDecode(e('f0').innerText);
+            e('text2').innerHTML = htmlDecode(e('f1').innerText);
+            e('nameBar').style.display = e('f0').innerText === '' ? 'none' : 'flex';
+            e('titleBar').style.display = e('f1').innerText === '' ? 'none' : 'flex';
+            setTimeout(runAnimationIN, 40);
+        }
+
+        function runAnimationIN() {
+            anime.timeline({ easing: 'easeOutCubic', duration: 520 })
+                .add({
+                    targets: '#gfx',
+                    opacity: [0, 1],
+                    duration: 40,
+                    easing: 'linear'
+                }, 0)
+                .add({
+                    targets: '#titleBar',
+                    translateX: ['-18%', '0%'],
+                    opacity: [0, 1],
+                    duration: 420
+                }, 20)
+                .add({
+                    targets: '#nameBar',
+                    translateX: ['-14%', '0%'],
+                    opacity: [0, 1],
+                    duration: 380
+                }, 90)
+                .add({
+                    targets: '#text1',
+                    opacity: [0, 1],
+                    translateX: ['18%', '0%'],
+                    duration: 500
+                }, 120)
+                .add({
+                    targets: '#text2',
+                    opacity: [0, 1],
+                    translateX: ['10%', '0%'],
+                    duration: 420
+                }, 180)
+                .add({
+                    targets: '.chevrons i',
+                    opacity: [0, 1],
+                    translateX: ['-0.4vw', '0'],
+                    delay: anime.stagger(70),
+                    duration: 280
+                }, 260)
+                .add({
+                    targets: '.frame',
+                    opacity: [0, 1],
+                    duration: 360
+                }, 200);
+        }
+
+        function runAnimationOUT() {
+            anime.timeline({ easing: 'easeInCubic', duration: 420 })
+                .add({
+                    targets: ['#text1', '#text2', '.chevrons'],
+                    opacity: 0,
+                    translateX: '8%',
+                    duration: 220
+                }, 0)
+                .add({
+                    targets: '#nameBar',
+                    translateX: '-12%',
+                    opacity: 0,
+                    duration: 280
+                }, 60)
+                .add({
+                    targets: '#titleBar',
+                    translateX: '-16%',
+                    opacity: 0,
+                    duration: 300
+                }, 90)
+                .add({
+                    targets: '#gfx',
+                    opacity: 0,
+                    duration: 180
+                }, 260);
+        }
+
+        window.SPXGCTemplateDefinition = {
+            "description": "Geometric dual lower third (navy + orange)",
+            "playserver": "OVERLAY",
+            "playchannel": "1",
+            "playlayer": "3",
+            "webplayout": "3",
+            "out": "manual",
+            "dataformat": "json",
+            "uicolor": "4",
+            "DataFields": [
+                {
+                    "ftype": "instruction",
+                    "value": "Two-tier geometric lower third. Leave the lower line empty to play the name bar only."
+                },
+                {
+                    "field": "f0",
+                    "ftype": "textfield",
+                    "title": "Name / headline",
+                    "value": "Jane Mwangi"
+                },
+                {
+                    "field": "f1",
+                    "ftype": "textfield",
+                    "title": "Title or location",
+                    "value": "Correspondent  ·  Nairobi"
+                },
+                {
+                    "field": "f99",
+                    "ftype": "filelist",
+                    "title": "Visual theme",
+                    "assetfolder": "./themes/",
+                    "extension": "css",
+                    "value": "./themes/Default.css"
+                }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const params = new URLSearchParams(window.location.search);
+            const preview = params.has('preview') || params.has('still');
+            if (preview) document.documentElement.classList.add('preview');
+            const empty = !e('f0').innerText;
+            if (preview || empty) {
+                window.SPXGCTemplateDefinition.DataFields.forEach(function (field) {
+                    if (field.field && field.value && e(field.field) && !e(field.field).innerText) {
+                        e(field.field).innerText = field.value;
+                    }
+                });
+            }
+            if (params.has('still')) {
+                if (e('f99') && e('f99').innerText) e('DynamicTheme').href = e('f99').innerText;
+                e('text1').innerHTML = htmlDecode(e('f0').innerText);
+                e('text2').innerHTML = htmlDecode(e('f1').innerText);
+                e('nameBar').style.display = e('f0').innerText === '' ? 'none' : 'flex';
+                e('titleBar').style.display = e('f1').innerText === '' ? 'none' : 'flex';
+                e('gfx').style.opacity = 1;
+                return;
+            }
+            if (params.has('preview') || window.location.protocol === 'file:') {
+                runTemplateUpdate();
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="SPXWindow">
+        <div id="gfx">
+            <div class="frame"></div>
+            <div id="nameBar">
+                <span id="text1"></span>
+            </div>
+            <div id="titleBar">
+                <div class="stripes" aria-hidden="true"><span></span><span></span></div>
+                <span id="text2"></span>
+                <div class="chevrons" aria-hidden="true"><i></i><i></i><i></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="hiddenSpxData">
+        <div id="f0"></div>
+        <div id="f1"></div>
+        <div id="f99"></div>
+    </div>
+</body>
+</html>

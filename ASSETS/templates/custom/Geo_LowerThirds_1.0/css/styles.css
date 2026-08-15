@@ -1,0 +1,64 @@
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0);
+}
+
+html.preview,
+html.preview body {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.06), transparent 40%),
+        linear-gradient(160deg, #1a1f2b 0%, #0e1218 100%);
+}
+
+.SPXWindow {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    position: absolute;
+    box-sizing: border-box;
+    background-color: rgba(255, 255, 255, 0);
+    border-style: solid;
+    border-color: transparent;
+    border-top-width: var(--theme-viewport-padding-top);
+    border-left-width: var(--theme-viewport-padding-sides);
+    border-right-width: var(--theme-viewport-padding-sides);
+    border-bottom-width: var(--theme-viewport-padding-bottom);
+}
+
+#hiddenSpxData {
+    top: 50%;
+    left: 50%;
+    width: 50vw;
+    opacity: 0;
+    padding: 1em;
+    display: flex;
+    z-index: 1000;
+    font-size: 3em;
+    border-radius: 1em;
+    position: absolute;
+    color: yellowgreen;
+    flex-direction: column;
+    border: 2px solid yellowgreen;
+    background: rgba(0, 0, 0, 0.7);
+    transform: translate(-50%, -50%);
+    font-family: monospace !important;
+    pointer-events: none;
+}
+
+div {
+    white-space: nowrap;
+    overflow: hidden;
+}
