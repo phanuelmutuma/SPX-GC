@@ -52,6 +52,23 @@ This repository contains the open source version of the SPX Graphics Controller.
 
 See [installation instructions](https://docs.spxgraphics.com/Guides/Getting+Started/Installation).
 
+## Desktop downloads (GitHub Releases)
+
+Prebuilt apps are on the **[Releases](https://github.com/phanuelmutuma/SPX-GC/releases)** page.
+
+**Latest: [v1.4.1](https://github.com/phanuelmutuma/SPX-GC/releases/tag/v1.4.1)**
+
+| Your computer | Download |
+|---|---|
+| Mac Apple silicon (M1 / M2 / M3 / M4) | [SPX-1.4.1-macos-arm64.zip](https://github.com/phanuelmutuma/SPX-GC/releases/download/v1.4.1/SPX-1.4.1-macos-arm64.zip) |
+| Intel Mac | [SPX-1.4.1-macos-x64.zip](https://github.com/phanuelmutuma/SPX-GC/releases/download/v1.4.1/SPX-1.4.1-macos-x64.zip) |
+| Windows 64-bit | [SPX-1.4.1-windows-x64.zip](https://github.com/phanuelmutuma/SPX-GC/releases/download/v1.4.1/SPX-1.4.1-windows-x64.zip) |
+| Linux 64-bit | [SPX-1.4.1-linux-x64.zip](https://github.com/phanuelmutuma/SPX-GC/releases/download/v1.4.1/SPX-1.4.1-linux-x64.zip) |
+
+On a Mac: unzip, right-click `SPX.app` → **Open**. If Gatekeeper blocks it, run `xattr -cr SPX.app` and Open again. The controller loads at http://localhost:5656
+
+Future versions: push a `v*` tag (for example `v1.4.2`) and GitHub Actions will build and attach new files on the Releases page.
+
 ## Run from source
 
 Requires Node.js 18 or newer.
