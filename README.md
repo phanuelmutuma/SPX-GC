@@ -3,7 +3,7 @@
 
 **Manage and control HTML graphics in live production.**
 
->  Readme updated 2026-05-28
+>  Readme updated 2026-08-15
 <br>
 
 ## SPX in a nut shell
@@ -46,7 +46,7 @@ or any other video pipeline supporting HTML sources.
 
 ## OPEN SOURCE VERSION
 
-Latest version 1.4.1 (May 2026)
+Latest version 1.4.2 (August 2026)
 
 This repository contains the open source version of the SPX Graphics Controller. You can clone the repo and use it freely. The open source version does not contain all features or API functionalities of the commercial applications, but it can be used without any other limitations or watermarks.
 
@@ -56,18 +56,18 @@ See [installation instructions](https://docs.spxgraphics.com/Guides/Getting+Star
 
 Prebuilt apps are on the **[Releases](https://github.com/phanuelmutuma/SPX-GC/releases)** page.
 
-**Latest: [v1.4.1](https://github.com/phanuelmutuma/SPX-GC/releases/tag/v1.4.1)**
+**Latest: [v1.4.2](https://github.com/phanuelmutuma/SPX-GC/releases/tag/v1.4.2)**
 
 | Your computer | Download |
 |---|---|
-| Mac Apple silicon (M1 / M2 / M3 / M4) | [SPX-1.4.1-macos-arm64.zip](https://github.com/phanuelmutuma/SPX-GC/releases/download/v1.4.1/SPX-1.4.1-macos-arm64.zip) |
-| Intel Mac | [SPX-1.4.1-macos-x64.zip](https://github.com/phanuelmutuma/SPX-GC/releases/download/v1.4.1/SPX-1.4.1-macos-x64.zip) |
-| Windows 64-bit | [SPX-1.4.1-windows-x64.zip](https://github.com/phanuelmutuma/SPX-GC/releases/download/v1.4.1/SPX-1.4.1-windows-x64.zip) |
-| Linux 64-bit | [SPX-1.4.1-linux-x64.zip](https://github.com/phanuelmutuma/SPX-GC/releases/download/v1.4.1/SPX-1.4.1-linux-x64.zip) |
+| Mac Apple silicon (M1 / M2 / M3 / M4) | [SPX-1.4.2-macos-arm64.zip](https://github.com/phanuelmutuma/SPX-GC/releases/download/v1.4.2/SPX-1.4.2-macos-arm64.zip) |
+| Intel Mac | [SPX-1.4.2-macos-x64.zip](https://github.com/phanuelmutuma/SPX-GC/releases/download/v1.4.2/SPX-1.4.2-macos-x64.zip) |
+| Windows 64-bit | [SPX-1.4.2-windows-x64.zip](https://github.com/phanuelmutuma/SPX-GC/releases/download/v1.4.2/SPX-1.4.2-windows-x64.zip) |
+| Linux 64-bit | [SPX-1.4.2-linux-x64.zip](https://github.com/phanuelmutuma/SPX-GC/releases/download/v1.4.2/SPX-1.4.2-linux-x64.zip) |
 
 On a Mac: unzip, right-click `SPX.app` → **Open**. If Gatekeeper blocks it, run `xattr -cr SPX.app` and Open again. The controller loads at http://localhost:5656
 
-Future versions: push a `v*` tag (for example `v1.4.2`) and GitHub Actions will build and attach new files on the Releases page.
+Future versions: push a `v*` tag (for example `v1.4.3`) and GitHub Actions will build and attach new files on the Releases page.
 
 ## Run from source
 
