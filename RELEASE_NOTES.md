@@ -21,6 +21,7 @@
 * Fixes repeated **Disconnected from SPX server** drops: Socket.IO client now matches the 4.8 server, reconnects after a server restart, and no longer locks the rundown on brief transport blips
 * CasparCG TCP connections retry automatically with backoff and keep-alive after a drop
 * `npm run dev` no longer restarts the server on rundown/log writes (nodemon ignore config)
+* Windows desktop builds run `pkg` via Node instead of `pkg.cmd` (avoids spawn EINVAL on current GitHub runners)
 
 ## **1.4.1** (May 28 2026)
 
