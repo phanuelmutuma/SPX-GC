@@ -59,6 +59,7 @@ DATAROOT*
 .DS_Store
 pkg-builds/
 zip_builds/
+dist/
 kubernetes/
 node_modules/
 .VSCodeCounter/

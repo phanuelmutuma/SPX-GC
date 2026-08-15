@@ -8,6 +8,9 @@
 **⚠ PLEASE UNDERSTAND:** Features and changes below may not fully work as the source code is constantly under development. For a stable and more tested version, please use the published binary releases.
 
 * Fixes a string/bool type error in server.js
+* Adds desktop packaging scripts: `npm run build:macos` produces a double-clickable `SPX.app` (Apple Silicon and Intel). Windows/Linux targets are available as `npm run build:windows` and `npm run build:linux`.
+* `npm start` now runs `node server.js` so a fresh clone works without pm2. The old command is `npm run start:pm2`.
+
 
 
 # Published releases

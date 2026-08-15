@@ -903,7 +903,7 @@ var server = app.listen(port, (err) => {
   console.log('  ' + line3s);
   console.log('');
 
-  if ( config.general.launchBrowser || global.generatingDefaultConfig ) {
+  if ( !process.env.SPX_LAUNCHER && ( config.general.launchBrowser || global.generatingDefaultConfig ) ) {
     try {
       (async () => {
         require("openurl").open(`http://${ipad}:${port}/`)

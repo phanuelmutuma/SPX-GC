@@ -7,7 +7,10 @@ const path = require('path');
 const moment = require('moment');
 const wavplayer = require('node-wav-player');
 const PlayoutCCG = require('./playout_casparCG.js');
-const glob = require("glob");
+const globLib = require("glob");
+const globSync = typeof globLib.globSync === 'function'
+  ? globLib.globSync
+  : globLib.sync.bind(globLib);
 const ip = require('ip')
 const axios = require('axios')
 const http = require('http');
@@ -1081,7 +1084,7 @@ function datarootSize () {
         let folderpath =  path.normalize(config.general.dataroot);
         let projects = 0;
         let rundowns = 0;
-        let filesArr = glob.sync(folderpath + "/**/*.json")
+        let filesArr = globSync(folderpath + "/**/*.json")
         filesArr.forEach((file,index) => {
           if (file.includes('profile.json')) {projects = projects + 1}
         });

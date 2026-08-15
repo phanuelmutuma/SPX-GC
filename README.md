@@ -52,6 +52,35 @@ This repository contains the open source version of the SPX Graphics Controller.
 
 See [installation instructions](https://docs.spxgraphics.com/Guides/Getting+Started/Installation).
 
+## Run from source
+
+Requires Node.js 18 or newer.
+
+```sh
+npm install
+npm start
+```
+
+Then open `http://localhost:5656` in a browser. `npm start` runs `node server.js` (the previous `pm2` command is still available as `npm run start:pm2`).
+
+## Build desktop apps
+
+This repo can pack SPX into a standalone app with [`@yao-pkg/pkg`](https://github.com/yao-pkg/pkg) — the same approach used by official SPX binaries. Mac is first: you get a double-clickable `SPX.app` that starts the server and opens the controller UI.
+
+```sh
+npm install
+npm run build:macos          # Apple Silicon + Intel .app bundles
+npm run build:macos:arm64    # Apple Silicon only
+npm run build:macos:x64      # Intel only
+npm run build:windows        # Windows x64 folder + zip
+npm run build:linux          # Linux x64 folder + zip
+```
+
+Builds land in `dist/`. The Mac zip contains `SPX.app`. On Linux the build script downloads `ldid` and ad-hoc signs the Mac binary so macOS will launch it. Gatekeeper still blocks first open of an internet-downloaded app until you right-click → Open, or run `xattr -cr SPX.app`.
+
+Windows and Linux builds are a folder with `SPX.exe` / `SPX` plus `ASSETS`, `DATAROOT`, and `locales`. Double-click the binary (or `start-spx.cmd` on Windows).
+
+
 
 ## COMMERCIAL VERSIONS
 
