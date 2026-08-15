@@ -76,7 +76,7 @@ npm run build:windows        # Windows x64 folder + zip
 npm run build:linux          # Linux x64 folder + zip
 ```
 
-Builds land in `dist/`. The Mac zip contains `SPX.app`. Unsigned macOS builds are blocked by Gatekeeper until you right-click the app, choose Open, and confirm — or run `xattr -cr SPX.app`.
+Builds land in `dist/`. The Mac zip contains `SPX.app`. On Linux the build script downloads `ldid` and ad-hoc signs the Mac binary so macOS will launch it. Gatekeeper still blocks first open of an internet-downloaded app until you right-click → Open, or run `xattr -cr SPX.app`.
 
 Windows and Linux builds are a folder with `SPX.exe` / `SPX` plus `ASSETS`, `DATAROOT`, and `locales`. Double-click the binary (or `start-spx.cmd` on Windows).
 

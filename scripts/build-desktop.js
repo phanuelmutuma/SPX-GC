@@ -270,7 +270,7 @@ function rasterizeOfficialSvg() {
 }
 
 function prepareIcons() {
-  const assetsDir = path.join(__dirname, 'assets');
+  const assetsDir = path.join(DIST, '.tools', 'icons');
   mkdirp(assetsDir);
   const pngPath = path.join(assetsDir, 'icon.png');
   const icnsPath = path.join(assetsDir, 'icon.icns');
@@ -307,6 +307,54 @@ function zipDirectory(sourceDir, zipPath) {
   run('tar', ['-czf', tarPath, name], { cwd: parent });
 }
 
+function ensureLdid() {
+  const which = spawnSync('which', ['ldid'], { encoding: 'utf8' });
+  if (which.status === 0 && which.stdout) {
+    return which.stdout.trim();
+  }
+
+  const cached = path.join(DIST, '.tools', process.platform === 'linux' ? 'ldid' : 'ldid.bin');
+  if (fs.existsSync(cached)) return cached;
+
+  if (process.platform !== 'linux' || process.arch !== 'x64') {
+    return null;
+  }
+
+  mkdirp(path.dirname(cached));
+  log('Downloading ldid for ad-hoc macOS signing...');
+  const url =
+    'https://github.com/ProcursusTeam/ldid/releases/download/v2.1.5-procursus7/ldid_linux_x86_64';
+  const downloaded = spawnSync('curl', ['-L', '--fail', '-o', cached, url], {
+    stdio: 'inherit',
+  });
+  if (downloaded.status !== 0 || !fs.existsSync(cached)) {
+    return null;
+  }
+  fs.chmodSync(cached, 0o755);
+  return cached;
+}
+
+function adHocSignMacBinary(binaryPath) {
+  const ldid = ensureLdid();
+  if (!ldid) {
+    log(
+      'WARNING: ldid not found. On a Mac run: codesign --sign - --force "' +
+        binaryPath +
+        '"'
+    );
+    return;
+  }
+  let signed = spawnSync(ldid, ['-S', '-Cadhoc', binaryPath], { stdio: 'inherit' });
+  if (signed.status !== 0) {
+    signed = spawnSync(ldid, ['-S', binaryPath], { stdio: 'inherit' });
+  }
+  if (signed.status !== 0) {
+    log('WARNING: ad-hoc signing failed for ' + binaryPath);
+    return;
+  }
+  log('Ad-hoc signed ' + binaryPath);
+}
+
 function assembleMacApp(target, binaryPath, icons) {
   const distName = 'SPX-' + VERSION + '-macos-' + target.arch;
   const appRoot = path.join(DIST, distName);
@@ -337,6 +385,7 @@ function assembleMacApp(target, binaryPath, icons) {
   const serverDest = path.join(runtime, 'SPX');
   fs.copyFileSync(binaryPath, serverDest);
   fs.chmodSync(serverDest, 0o755);
+  adHocSignMacBinary(serverDest);
   copyRuntimeFiles(runtime);
 
   if (icons.icnsPath && fs.existsSync(icons.icnsPath)) {
@@ -385,6 +434,7 @@ function buildTarget(name, icons) {
     'server.js',
     '--compress',
     'GZip',
+    '--no-native-build',
     '--targets',
     target.pkg,
     '--output',
@@ -396,6 +446,7 @@ function buildTarget(name, icons) {
   }
 
   if (target.platform === 'macos') {
+    adHocSignMacBinary(outputBinary);
     assembleMacApp(target, outputBinary, icons);
   } else {
     assembleFolder(target, outputBinary);
@@ -413,6 +464,16 @@ function main() {
   mkdirp(DIST);
 
   const icons = prepareIcons();
+  const needsMacSign = names.some(function (name) {
+    return TARGETS[name].platform === 'macos';
+  });
+  if (needsMacSign) {
+    const ldid = ensureLdid();
+    if (ldid) {
+      process.env.PATH = path.dirname(ldid) + path.delimiter + process.env.PATH;
+      log('ldid available at ' + ldid);
+    }
+  }
   for (let i = 0; i < names.length; i++) {
     buildTarget(names[i], icons);
   }
