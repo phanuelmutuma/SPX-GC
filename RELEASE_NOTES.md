@@ -1,6 +1,6 @@
 
 # SPX Release Notes
-> Updated 2026-05-28<br>
+> Updated 2026-08-15<br>
 <small>Most recent updates are at the top.</small>
 
 <BR>
@@ -15,6 +15,12 @@
 
 
 # Published releases
+
+## **1.4.2** (August 15 2026)
+
+* Fixes repeated **Disconnected from SPX server** drops: Socket.IO client now matches the 4.8 server, reconnects after a server restart, and no longer locks the rundown on brief transport blips
+* CasparCG TCP connections retry automatically with backoff and keep-alive after a drop
+* `npm run dev` no longer restarts the server on rundown/log writes (nodemon ignore config)
 
 ## **1.4.1** (May 28 2026)
 
