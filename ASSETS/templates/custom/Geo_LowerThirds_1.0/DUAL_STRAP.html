@@ -268,6 +268,7 @@
         };
 
         document.addEventListener('DOMContentLoaded', function () {
+            if (typeof e !== 'function') return;
             const params = new URLSearchParams(window.location.search);
             const preview = params.has('preview') || params.has('still');
             if (preview) document.documentElement.classList.add('preview');
