@@ -430,10 +430,17 @@ function buildTarget(name, icons) {
   const outputBinary = path.join(PKG_OUT, target.binaryName);
   rimraf(outputBinary);
 
+  // Cross-compiling (Linux -> macOS/Windows) cannot generate V8 bytecode
+  // for the target CPU. Ship JS source instead so the snapshot contains
+  // server.js and the rest of the app. --public is required with --no-bytecode.
   run(findPkgBin(), [
     'server.js',
     '--compress',
     'GZip',
+    '--public',
+    '--public-packages',
+    '*',
+    '--no-bytecode',
     '--no-native-build',
     '--targets',
     target.pkg,

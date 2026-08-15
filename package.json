@@ -6,15 +6,15 @@
   "main": "server.js",
   "bin": "server.js",
   "pkg": {
-    "scripts": [
-      "routes/**/*.js",
-      "utils/**/*.js"
-    ],
     "assets": [
       "views/**/*",
       "static/**/*"
     ],
-    "outputPath": "dist/pkg"
+    "outputPath": "dist/pkg",
+    "public": true,
+    "publicPackages": [
+      "*"
+    ]
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

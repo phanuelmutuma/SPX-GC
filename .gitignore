@@ -15,7 +15,6 @@
 *.rar
 *.tar
 *.zip
-!downloads/*.zip
 *.log
 *.env
 *.bat
