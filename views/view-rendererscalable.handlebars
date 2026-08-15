@@ -81,7 +81,7 @@
     </style>
     <script src="/js/socket.io.js"></script>
     <script>
-        var socket = io();
+        var socket = io(window.SPX_IO_OPTIONS || { reconnection: true, transports: ['websocket', 'polling'] });
         let socData={};
 
         socket.on('connect', function () {
@@ -93,6 +93,12 @@
             {{/ifValue}}
             socData.spxcmd = 'identifyClient';
             socket.emit('SPXMessage2Server', socData);
+        });
+
+        socket.on('disconnect', function (reason) {
+            if (reason === 'io server disconnect') {
+                socket.connect();
+            }
         });
 
         socket.on('SPXMessage2Client', function (data) {

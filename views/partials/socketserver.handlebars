@@ -1,5 +1,5 @@
 <script src="/js/socket.io.js"></script>
 <script>
-  var serverAddress = 'ws://{{ getServerAddress }}';
-  var socket = io(serverAddress);
+  var serverAddress = 'http://{{ getServerAddress }}';
+  var socket = io(serverAddress, window.SPX_IO_OPTIONS || { reconnection: true, transports: ['websocket', 'polling'] });
 </script>

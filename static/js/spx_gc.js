@@ -3,7 +3,17 @@
 // ***************************************
 // (c) 2020-2024 SPX Graphics
 // ***************************************
-var socket = io();
+window.SPX_IO_OPTIONS = {
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 500,
+    reconnectionDelayMax: 5000,
+    timeout: 20000,
+    transports: ['websocket', 'polling']
+};
+
+var socket = (typeof socket !== 'undefined' && socket) ? socket : io(window.SPX_IO_OPTIONS);
+let spxDisconnectBannerTimer = null;
 
 // Global App State
 let APPSTATE = "INIT";  // see AppState()
@@ -13,19 +23,26 @@ document.onkeydown = checkKey;
 
 socket.on('connect', function () {
     // Added in 1.1.0:
+    if (spxDisconnectBannerTimer) {
+        clearTimeout(spxDisconnectBannerTimer);
+        spxDisconnectBannerTimer = null;
+    }
     if (document.getElementById('logo') && document.getElementById('logo_off')) {
         document.getElementById('logo').src=document.getElementById('logo_on').src;
-        document.body.style="pointer-events: auto;" // restore clickability
+        document.body.style.pointerEvents = 'auto'; // restore clickability
         hideMessageSlider();
     }
 }); // end connect
+
+socket.on('connect_error', function (err) {
+    console.warn('SPX socket connect_error:', err && err.message ? err.message : err);
+});
 
 socket.on('SPXMessage2Extension', function (data) {
     // Handles messages coming from server to an extension.
     // All SPX extensions must have 3 tags in their HTML:
     //
     //  <script src="/js/socket.io.js"></script>
-    //  <script>var socket = io();</script>
     //  <script src="/js/spx_gc.js"></script>
     //
     // Also if the extension JS code is a module the
@@ -242,12 +259,23 @@ socket.on('SPXMessage2Controller', function (data) {
     }
 }); // end SPXMessage2Controller
 
-socket.on('disconnect', function () {
-    // Added in 1.1.0
+socket.on('disconnect', function (reason) {
+    // Added in 1.1.0. Socket.IO does not auto-reconnect after an explicit
+    // server disconnect (restart, unknown session id), so reconnect manually.
+    if (reason === 'io server disconnect') {
+        socket.connect();
+    }
     if (document.getElementById('logo') && document.getElementById('logo_off')) {
-        document.getElementById('logo').src=document.getElementById('logo_off').src;
-        showMessageSlider('Disconnected from SPX server', type='error', true)
-        document.body.style="pointer-events: none;"  // disable clickability
+        if (spxDisconnectBannerTimer) {
+            clearTimeout(spxDisconnectBannerTimer);
+        }
+        // Brief transport upgrades / pings should not lock the UI.
+        spxDisconnectBannerTimer = setTimeout(function () {
+            if (socket.connected) { return; }
+            document.getElementById('logo').src=document.getElementById('logo_off').src;
+            showMessageSlider('Disconnected from SPX server', 'error', true)
+            document.body.style.pointerEvents = 'none';  // disable clickability
+        }, 1500);
     }
 }); // end disconnect
 
