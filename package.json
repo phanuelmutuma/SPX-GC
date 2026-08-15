@@ -6,10 +6,15 @@
   "main": "server.js",
   "bin": "server.js",
   "pkg": {
+    "scripts": [
+      "routes/**/*.js",
+      "utils/**/*.js"
+    ],
     "assets": [
       "views/**/*",
       "static/**/*"
-    ]
+    ],
+    "outputPath": "dist/pkg"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -17,9 +22,16 @@
     "dev": "nodemon server.js -i DATAROOT/* -i ASSETS/* -i config.json -i DATAROOT_VIDEO/*",
     "devdemo": "nodemon server.js config_demodataroot.json -i DATAROOT_DEMO/* -i config_demodataroot.json",
     "dev2": "nodemon server.js config2.json -i DATAROOT/* -i config2.json",
-    "start": "pm2 start server.js --name GC",
+    "start": "node server.js",
+    "start:pm2": "pm2 start server.js --name GC",
     "stop": "pm2 stop server.js",
-    "build": "BUILD_PACKAGES.BAT"
+    "build": "node scripts/build-desktop.js macos",
+    "build:macos": "node scripts/build-desktop.js macos",
+    "build:macos:arm64": "node scripts/build-desktop.js macos-arm64",
+    "build:macos:x64": "node scripts/build-desktop.js macos-x64",
+    "build:windows": "node scripts/build-desktop.js windows",
+    "build:linux": "node scripts/build-desktop.js linux",
+    "build:all": "node scripts/build-desktop.js all"
   },
   "keywords": [],
   "author": "Tuomo Kulomaa <tuomo@spxgraphics.com> (https://spxgraphics.com)",
@@ -50,6 +62,11 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "@yao-pkg/pkg": "^6.5.1",
     "nodemon": "^3.1.7"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
